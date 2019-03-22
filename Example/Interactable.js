@@ -517,8 +517,7 @@ class Interactable extends Component {
                 showsVerticalScrollIndicator={false}
                 onScrollEndDrag={this.onScrollEnd}
                 onMomentumScrollEnd={this.onScrollEnd}
-                bounces={false}
-                waitFor={[this.panHandlerDown]}>
+                bounces={false}>
                 {children}
               </ScrollView>
             </Animated.View>
