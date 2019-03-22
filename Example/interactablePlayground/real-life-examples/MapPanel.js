@@ -6,6 +6,8 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  ScrollView,
+  ToastAndroid,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import Interactable from '../../Interactable';
@@ -33,7 +35,7 @@ export default class MapPanel extends Component {
               {
                 backgroundColor: 'black',
                 opacity: this._deltaY.interpolate({
-                  inputRange: [0, Screen.height - 100],
+                  inputRange: [0, Screen.height - 400],
                   outputRange: [0.5, 0],
                   extrapolateRight: 'clamp',
                 }),
@@ -43,14 +45,20 @@ export default class MapPanel extends Component {
           <Interactable.View
             verticalOnly={true}
             snapPoints={[
-              { y: 40 },
+              { y: 0 },
               { y: Screen.height - 300 },
               { y: Screen.height - 100 },
             ]}
-            boundaries={{ top: -300 }}
+            onSnap={({ nativeEvent }) =>
+              ToastAndroid.show(
+                `Snap index ${nativeEvent.index}`,
+                ToastAndroid.SHORT
+              )
+            }
+            boundaries={{ top: 0 }}
             initialPosition={{ y: Screen.height - 100 }}
             animatedValueY={this._deltaY}>
-            <View style={styles.panel}>
+            <ScrollView style={styles.panel}>
               <View style={styles.panelHeader}>
                 <View style={styles.panelHandle} />
               </View>
@@ -59,7 +67,9 @@ export default class MapPanel extends Component {
                 International Airport - 40 miles away
               </Text>
               <View style={styles.panelButton}>
-                <Text style={styles.panelButtonTitle}>Directions</Text>
+                <TouchableOpacity style={styles.panelButtonTitle}>
+                  <Text>Directions</Text>
+                </TouchableOpacity>
               </View>
               <View style={styles.panelButton}>
                 <Text style={styles.panelButtonTitle}>Search Nearby</Text>
@@ -68,7 +78,11 @@ export default class MapPanel extends Component {
                 style={styles.photo}
                 source={require('../assets/airport-photo.jpg')}
               />
-            </View>
+              <Image
+                style={styles.photo}
+                source={require('../assets/airport-photo.jpg')}
+              />
+            </ScrollView>
           </Interactable.View>
         </View>
       </View>
@@ -89,9 +103,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    flex: 1,
   },
   panel: {
-    height: Screen.height + 300,
     padding: 20,
     backgroundColor: '#f7f5eee8',
     borderTopLeftRadius: 20,
@@ -141,5 +155,9 @@ const styles = StyleSheet.create({
   map: {
     height: Screen.height,
     width: Screen.width,
+  },
+  scrollContent: {
+    flex: 1,
+    alignSelf: 'stretch',
   },
 });
