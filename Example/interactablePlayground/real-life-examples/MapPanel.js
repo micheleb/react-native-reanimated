@@ -6,7 +6,6 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  ScrollView,
   ToastAndroid,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
@@ -49,16 +48,10 @@ export default class MapPanel extends Component {
               { y: Screen.height - 300 },
               { y: Screen.height - 100 },
             ]}
-            onSnap={({ nativeEvent }) =>
-              ToastAndroid.show(
-                `Snap index ${nativeEvent.index}`,
-                ToastAndroid.SHORT
-              )
-            }
             boundaries={{ top: 0 }}
             initialPosition={{ y: Screen.height - 100 }}
             animatedValueY={this._deltaY}>
-            <ScrollView style={styles.panel}>
+            <View>
               <View style={styles.panelHeader}>
                 <View style={styles.panelHandle} />
               </View>
@@ -82,7 +75,7 @@ export default class MapPanel extends Component {
                 style={styles.photo}
                 source={require('../assets/airport-photo.jpg')}
               />
-            </ScrollView>
+            </View>
           </Interactable.View>
         </View>
       </View>
@@ -104,16 +97,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flex: 1,
-  },
-  panel: {
-    padding: 20,
-    backgroundColor: '#f7f5eee8',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 5,
-    shadowOpacity: 0.4,
   },
   panelHeader: {
     alignItems: 'center',

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ScrollView, ToastAndroid } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
@@ -202,6 +203,11 @@ class Interactable extends Component {
   constructor(props) {
     super(props);
 
+    this.onScrollEnd = this.onScrollEnd.bind(this);
+    this.onSnapChange = this.onSnapChange.bind(this);
+
+    this.state = { snapState: 1, lastScrollPosition: 0 };
+
     const gesture = { x: new Value(0), y: new Value(0) };
     const state = new Value(-1);
 
@@ -305,7 +311,7 @@ class Interactable extends Component {
       tossedTarget,
       props.snapPoints,
       snapAnchor,
-      props.onSnap,
+      this.onSnapChange,
       props.onDrag
     );
 
@@ -458,29 +464,66 @@ class Interactable extends Component {
 
     this._transX = trans('x', 'vx', 'left', 'right');
     this._transY = trans('y', 'vy', 'top', 'bottom');
+
+    // multi-handler stuff
+    this.panHandlerDown = React.createRef();
+    this.panHandlerUp = React.createRef();
+    this.scrollViewHandler = React.createRef();
   }
+
+  onScrollEnd = ({ nativeEvent }) =>
+    this.setState({ lastScrollPosition: nativeEvent.contentOffset.y });
+
+  onSnapChange = ({ nativeEvent }) =>
+    this.setState({ snapState: nativeEvent.index });
 
   render() {
     const { children, style, horizontalOnly, verticalOnly } = this.props;
     return (
       <PanGestureHandler
         maxPointers={1}
-        enabled={this.props.dragEnabled}
+        ref={this.panHandlerUp}
+        simultaneousHandlers={this.scrollViewHandler}
+        enabled={this.state.snapState !== 0}
         onGestureEvent={this._onGestureEvent}
-        onHandlerStateChange={this._onGestureEvent}>
-        <Animated.View
-          style={[
-            style,
-            {
-              transform: [
+        onHandlerStateChange={this._onGestureEvent}
+        activeOffsetY={-0.1}>
+        <Animated.View>
+          <PanGestureHandler
+            maxPointers={1}
+            ref={this.panHandlerDown}
+            simultaneousHandlers={this.scrollViewHandler}
+            enabled={
+              this.state.snapState !== 0 || this.state.lastScrollPosition <= 1
+            }
+            onGestureEvent={this._onGestureEvent}
+            onHandlerStateChange={this._onGestureEvent}
+            activeOffsetY={0.1}>
+            <Animated.View
+              style={[
+                style,
                 {
-                  translateX: verticalOnly ? 0 : this._transX,
-                  translateY: horizontalOnly ? 0 : this._transY,
+                  transform: [
+                    {
+                      translateX: verticalOnly ? 0 : this._transX,
+                      translateY: horizontalOnly ? 0 : this._transY,
+                    },
+                  ],
                 },
-              ],
-            },
-          ]}>
-          {children}
+              ]}>
+              <ScrollView
+                style={styles.panel}
+                ref={this.scrollViewHandler}
+                scrollEnabled={this.state.snapState === 0}
+                showsVerticalScrollIndicator={false}
+                onScrollEndDrag={this.onScrollEnd}
+                onMomentumScrollEnd={this.onScrollEnd}
+                bounces={false}
+                waitFor={[this.panHandlerDown]}>
+                {children}
+              </ScrollView>
+            </Animated.View>
+          </PanGestureHandler>
         </Animated.View>
       </PanGestureHandler>
     );
@@ -508,6 +551,7 @@ class Interactable extends Component {
     );
     this._snapAnchor.x.setValue(snapPoint.x || 0);
     this._snapAnchor.y.setValue(snapPoint.y || 0);
+    this.onSnapChange({ nativeEvent: { ...snapPoint, index } });
     this.props.onSnap &&
       this.props.onSnap({ nativeEvent: { ...snapPoint, index } });
   }
@@ -523,6 +567,13 @@ class Interactable extends Component {
     }
   }
 }
+
+const styles = {
+  panel: {
+    padding: 20,
+    backgroundColor: '#f7f5eee8',
+  },
+};
 
 export default {
   View: Interactable,
