@@ -51,7 +51,7 @@ export default class MapPanel extends Component {
             boundaries={{ top: 0 }}
             initialPosition={{ y: Screen.height - 100 }}
             animatedValueY={this._deltaY}>
-            <View>
+            <View style={styles.panel}>
               <View style={styles.panelHeader}>
                 <View style={styles.panelHandle} />
               </View>
@@ -75,6 +75,14 @@ export default class MapPanel extends Component {
                 style={styles.photo}
                 source={require('../assets/airport-photo.jpg')}
               />
+              <Image
+                style={styles.photo}
+                source={require('../assets/airport-photo.jpg')}
+              />
+              <Image
+                style={styles.photo}
+                source={require('../assets/airport-photo.jpg')}
+              />
             </View>
           </Interactable.View>
         </View>
@@ -89,6 +97,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#efefef',
+  },
+  panel: {
+    padding: 20,
+    backgroundColor: '#f7f5eee8',
   },
   panelContainer: {
     position: 'absolute',

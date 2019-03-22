@@ -512,7 +512,6 @@ class Interactable extends Component {
                 },
               ]}>
               <ScrollView
-                style={styles.panel}
                 ref={this.scrollViewHandler}
                 scrollEnabled={this.state.snapState === 0}
                 showsVerticalScrollIndicator={false}
@@ -567,13 +566,6 @@ class Interactable extends Component {
     }
   }
 }
-
-const styles = {
-  panel: {
-    padding: 20,
-    backgroundColor: '#f7f5eee8',
-  },
-};
 
 export default {
   View: Interactable,
